@@ -51,13 +51,57 @@ df_loc <- oil_spills %>%
 
 colnames(df_loc) <- c("latitude","longitude","net_loss")
 
-oil_sf <- st_as_sf(df_loc, coords = c("longitude","latitude"), crs = 4326)
+oil_sf <- st_as_sf(df_loc, coords = c("longitude","latitude"), crs = 4326) # Leaflet does recognize longitude/latitude without having to convert to spatial features, leaflet will just guess what your longitude latitude is when not in spatial features
 
 leaflet(oil_sf) %>% 
   addTiles() %>%
   addMarkers()
 
 ```
+
+### tmap plot with the Texas state shapefile
+
+```{r}
+
+states <- st_read(dsn = ".", layer = "states")
+
+tex_border <- states %>% 
+  filter(STATE_NAME == "Texas") %>% 
+  st_transform(4326)
+
+plot(tex_border)
+
+tm_shape(tex_border) +
+  tm_polygons() +
+  tm_shape(oil_sf) +
+  tm_dots(size = 0.3)
+
+```
+
+Question: 
+Are the points spatially random? 
+
+
+###Convert the data to spatial points patterns (combination of the point data and the bounding window)
+
+```{r}
+
+# Convert back from simple features to a data frame, but still not recognized as something to do point pattern analysis with
+
+spill_sp <- as(oil_sf, "Spatial")
+
+spill_ppp <- as(spill_sp, "ppp")
+
+tx_sp <- as(tex_border, "Spatial")
+tx_owin <- as(tx_sp, "owin")
+# Setting this as the outer window for the spatial point analysis
+
+
+all_ppp <- ppp(spill_ppp$x, spill_ppp$y, window = tx_owin)
+# Some points ommitted that don't align with the window 
+
+```
+
 
 
 
