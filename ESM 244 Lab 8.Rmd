@@ -103,6 +103,66 @@ all_ppp <- ppp(spill_ppp$x, spill_ppp$y, window = tx_owin)
 ```
 
 
+###A density plot:
+
+```{r}
+
+# Taking our combined point pattern info and creating a density plot
+plot(density(all_ppp, sigma = 0.4))
+
+```
+
+Recall: quadrat test really tests spatial evenness (even though its called a test of spatial randomness)
+
+## Quadrat test for spatial evenness
+
+Are oil spills spatially distrubuted throughout the state?
+
+```{r}
+
+oil_qt <- quadrat.test(all_ppp, nx = 5, ny = 5)
+
+# Separates Texas into quadrats, counts up the observations in each, performs Chi Square
+# Testing a null hypothesis of complete spatial randomness
+
+oil_qt
+
+# Retain alernative hypothesis that data are not evenly distributed
+
+plot(all_ppp)
+plot(oil_qt, add = TRUE, cex = 0.4)
+
+# Automatically calculates area and proportional number of counts in smaller quadrats based on the shape of Texas
+#In the graph, are given expected counts, standard deviations versus expected value and total quadrat area value
+
+```
+
+If data are spatially clustered, then nearest neighbors would be closer than they would be under CSR
+
+###G-Function for nearest neighbor analysis
+
+```{r}
+
+r <- seq(0,1, by = 0.01) # This sequence makes sense for the data, won't always be the case
+# Lag distance between points
+
+# Based on poisson distribution, recognizing the window and the points, what would it look like as CSR data?
+
+oil_gfun <- envelope(all_ppp, fun = Gest, r = r, nsim = 100) # Run 100 simulations using the r sequence and the G function
+
+# Theo column = theoretical modeled CSR
+
+ggplot(oil_gfun, aes(x = r, y = obs)) +
+  geom_line(color = "black") +
+  geom_line(aes(x = r, y = theo), color = "red")
+
+# Our observed data has a higher proportion of point pairs w/ nearest neighbors at shorter distances compared to CSR data
+
+```
+
+
+
+
 
 
 
