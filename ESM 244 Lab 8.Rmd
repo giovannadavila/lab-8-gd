@@ -160,7 +160,28 @@ ggplot(oil_gfun, aes(x = r, y = obs)) +
 
 ```
 
+###Nearest neighbor using the L-function (Ripley's K, standardized)
 
+```{r}
+
+# This is MORE computationally intensive. Looks at every event (point) in spcae and makes increasing bubbles around it until it incorporates all points around it that exist
+
+r2 <- seq(0,3, by = 0.5)
+# Chose a large increment so simulations wouldn't run forever
+
+oil_lfun <- envelope(all_ppp, fun = Lest, r = r2, nsim = 20, global = TRUE)
+
+ggplot(oil_lfun, aes(x = r2, y = obs)) +
+  geom_line(color = "green") +
+  geom_line(aes(x = r2, y = theo), color = "blue")
+
+
+```
+
+Conclusions: 
+- Map showed the data didn't look CSR
+- Ran a test that indicated it was not CSR
+- Both the G and L functions indicated the data was not CSR
 
 
 
